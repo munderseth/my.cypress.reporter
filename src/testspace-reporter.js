@@ -37,20 +37,34 @@ function MyReporter(runner, options) {
     testAttachments = [];
     if (!fs.existsSync(resultsDir)){
       fs.mkdirSync(resultsDir);
-  }
+    }
   });
 
   runner.on(EVENT_RUN_END, function() {
+
+    const specRoot        = "cypress/e2e/";
 
     // Root record
     var rootSuite = {name: "Root Suite",  timestamp: runner.stats.start, tests: runner.stats.tests,  file: aFileName};
     testSuites.push({$: rootSuite});
 
-    // Suite record containing testcase record(s)
-    // aAttachment = "[[ATTACHMENT|dashboard.png]]";
-    // testAttachments.push(aAttachment);
+    /*
+     Suite record containing testcase record(s)
+     aAttachment = "[[ATTACHMENT|dashboard.png]]";
+     testAttachments.push(aAttachment);
+     */
 
+    console.log(aFileName);
+    let testFilePathLinux  = aFileName.replace(/\\/g, "/");
+    let foldersAndFile     = testFilePathLinux.split(specRoot)[1];
+
+    /*
+    let splitFoldersFile   = foldersAndFile.split("/");
+    console.log(splitFoldersFile, splitFoldersFile[splitFoldersFile.length-1]);
     var videoFile = "cypress/videos/"+path.basename(aFileName)+".mp4";
+    */
+
+    var videoFile = "cypress/videos/"+foldersAndFile+".mp4";
     testVideo = "[[ATTACHMENT|"+videoFile+"]]";
 
     aSuite = {name: aSuiteName, timestamp: runner.stats.start, tests: runner.stats.tests, time: runner.stats.duration};
@@ -63,10 +77,10 @@ function MyReporter(runner, options) {
     results = { testsuites: {$: rootStats, testsuite:testSuites} }
 
     var xml = builder.buildObject(results);
-    fs.writeFileSync(resultsDir+"results-"+aSuiteName+".xml",xml)
+    fs.writeFileSync(resultsDir+"results."+foldersAndFile.replace(/\//g, "-")+".xml",xml);
 
     //console.log('     END: %d/%d', runner.stats.passes, runner.stats.tests);
-    console.log("END:", runner.stats)
+   // console.log("END:", runner.stats)
 
   });
 
@@ -84,7 +98,7 @@ function MyReporter(runner, options) {
     aFileName  = test.parent.parent.file;
 
     //console.log('       PASSS: %s', test.fullTitle())
-    console.log("CASE:", runner.stats)
+    //console.log("CASE:", runner.stats)
 
   });
 
