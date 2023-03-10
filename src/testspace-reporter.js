@@ -31,12 +31,53 @@ var nestedDescribes;
 var parentSuiteName;
 var parentFileName;
 
-const resultsDir  = 'cypress/results/';
-const specRoot    = "cypress/e2e/";
+const resultsDir     = 'cypress/results/';
+const videosDir      = 'cypress/videos/';
+const screenshotsDir = 'cypress/screenshots/';
+const specRoot       = "cypress/e2e/";
+
+function getCaseRecord(test, suitesCount, nestedDescribes) {
+
+  // suites == 0 indicates cases with NO "Describe"
+  if (suitesCount == 0) {
+    aFileName  = test.parent.file;
+    aSuiteName = path.basename(aFileName);
+    aCaseName  = test.title;  // standard test case name. Will be overwritten for for nested Describes
+  } else {
+    aFileName  = test.parent.parent.file;
+    aSuiteName = test.parent.title;
+    aCaseName  = test.title;  // standard test case name. Will be overwritten for for nested Describes
+
+    // Need to save this Suite as the "parent" in case there are nested Describes
+    if (nestedDescribes == 0) {
+      parentSuiteName = aSuiteName; // save this as the Suite Name
+      parentFileName  = aFileName;
+    }
+    if (nestedDescribes > 0) {
+      aSuiteName = parentSuiteName; // root parent name for nested Describes
+      aFileName  = parentFileName;
+
+      // Need to construct test case name using 1 or more nested "Describe" names
+      var parentObj = test.parent;
+      var theDescribeNames = [];
+      for (let i=0; i < nestedDescribes; i++ ) {
+          theDescribeNames.push(parentObj.title);
+          parentObj = parentObj.parent;
+      }
+      theDescribeNames.reverse()
+      theDescribeNames.push(test.title);
+      aCaseName = theDescribeNames.join(" -- ");
+    }
+  }
+
+}
 
 function MyReporter(runner, options) {
   Base.call(this, runner, options);
   const stats = runner.stats;
+  if (!fs.existsSync(resultsDir)){
+    fs.mkdirSync(resultsDir);
+  }
 
   runner.on(EVENT_RUN_BEGIN, function() {
     console.log('BEGIN ...');
@@ -45,24 +86,14 @@ function MyReporter(runner, options) {
     testCases       = [];
     testAttachments = [];
     nestedDescribes = -2;
-    if (!fs.existsSync(resultsDir)){
-      fs.mkdirSync(resultsDir);
-    }
   });
 
   runner.on(EVENT_RUN_END, function() {
 
     // Root record
-    var rootSuite = {name: "Root Suite",  timestamp: runner.stats.start, tests: runner.stats.tests,  file: aFileName};
+    var rootSuite = {name: "Root Suite",  timestamp: stats.start, tests: stats.tests,  file: aFileName};
     testSuites.push({$: rootSuite});
 
-    /*
-     Suite record containing testcase record(s)
-     aAttachment = "[[ATTACHMENT|dashboard.png]]";
-     testAttachments.push(aAttachment);
-     */
-
-    console.log(aFileName);
     let testFilePathLinux  = aFileName.replace(/\\/g, "/");
     let foldersAndFile     = testFilePathLinux.split(specRoot)[1];
 
@@ -72,24 +103,22 @@ function MyReporter(runner, options) {
     var videoFile = "cypress/videos/"+path.basename(aFileName)+".mp4";
     */
 
-    var videoFile = "cypress/videos/"+foldersAndFile+".mp4";
+    var videoFile = videosDir+foldersAndFile+".mp4";
     testVideo = "[[ATTACHMENT|"+videoFile+"]]";
 
-    aSuite = {name: aSuiteName, timestamp: runner.stats.start, tests: runner.stats.tests, time: runner.stats.duration};
+    aSuite = {name: aSuiteName, timestamp: stats.start, tests: stats.tests, time: stats.duration};
     var aSuiteRecord = {$: aSuite, testcase: testCases, 'system-out': testVideo}
 
     testSuites.push(aSuiteRecord)
 
     // Stats
-    var rootStats = {name: "Mocha Tests", time: runner.stats.duration,   tests:  runner.stats.tests, failures:  runner.stats.failures};
+    var rootStats = {name: "Mocha Tests", time: stats.duration,   tests: stats.tests, failures: stats.failures};
     results = { testsuites: {$: rootStats, testsuite:testSuites} }
 
     var xml = builder.buildObject(results);
     fs.writeFileSync(resultsDir+"results."+foldersAndFile.replace(/\//g, "-")+".xml",xml);
 
-    //console.log('     END: %d/%d', runner.stats.passes, runner.stats.tests);
-   // console.log("END:", runner.stats)
-
+    console.log('END   ...');
   });
 
   runner.on(EVENT_SUITE_BEGIN, function() {
@@ -101,49 +130,11 @@ function MyReporter(runner, options) {
   });
 
   runner.on(EVENT_TEST_PASS, function(test) {
-
-    // suites == 0 indicates cases with NO "Describe"
-    if (runner.stats.suites == 0) {
-
-        aFileName  = test.parent.file;
-        aSuiteName = path.basename(aFileName);
-        aCaseName = test.title;  // standard test case name. Will be overwritten for for nested Describes
-
-    } else {
-
-        aFileName  = test.parent.parent.file;
-        aSuiteName = test.parent.title;
-        aCaseName  = test.title;  // standard test case name. Will be overwritten for for nested Describes
-
-        // Need to save this Suite as the "parent" in case there are nested Describes
-        if (nestedDescribes == 0) {
-            parentSuiteName = aSuiteName; // save this as the Suite Name
-            parentFileName  = aFileName;
-        }
-
-        if (nestedDescribes > 0) {
-
-            aSuiteName = parentSuiteName; // root parent name for nested Describes
-            aFileName  = parentFileName;
-
-            // Need to construct test case name using 1 or more nested "Describe" names
-            var parentObj = test.parent;
-            var theDescribeNames = [];
-            for (let i=0; i < nestedDescribes; i++ ) {
-                theDescribeNames.push(parentObj.title);
-                parentObj = parentObj.parent;
-            }
-            theDescribeNames.reverse()
-            theDescribeNames.push(test.title);
-            aCaseName = theDescribeNames.join("->");
-
-        }
-    }
-
     /*
      *  Generate the case record
      */
 
+    getCaseRecord(test, stats.suites, nestedDescribes);
     var aCase = {name: aCaseName, classname: aSuiteName, time: test.duration};
     testCases.push({$: aCase});
 
@@ -153,7 +144,28 @@ function MyReporter(runner, options) {
   });
 
   runner.on(EVENT_TEST_FAIL, function(test, err) {
-    console.log('       FAIL: %s -- error: %s', test.fullTitle(), err.message);
+
+    getCaseRecord(test, stats.suites, nestedDescribes);
+    var aCase = {name: aCaseName, classname: aSuiteName, time: test.duration};
+    var message = {message: err.message, type: err.name}
+
+    let testFilePathLinux  = aFileName.replace(/\\/g, "/");
+    let foldersAndFile     = testFilePathLinux.split(specRoot)[1];
+    let imgFileName        = aCaseName+' (failed).png';
+/*
+    let theSuiteName       = "";
+    if (foldersAndFile != aSuiteName) theSuiteName = aSuiteName+' -- '
+*/
+    // Checking if case has no parent Describe
+    let theSuiteName = aSuiteName+' -- ';
+    if (stats.suites == 0 ) theSuiteName = "";
+
+    let imageFile      = screenshotsDir+foldersAndFile+'/'+theSuiteName+imgFileName;
+    let testScreenshot = "[[ATTACHMENT|"+imageFile+"]]";
+    testCases.push({$: aCase, 'failure': message, 'system-out': testScreenshot });
+
+    //console.log('       FAIL: %s -- error: %s', test.fullTitle(), err.message, err.name);
+
   });
 
 }
