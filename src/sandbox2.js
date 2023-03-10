@@ -15,89 +15,34 @@ const {
   EVENT_SUITE_END
 } = Mocha.Runner.constants
 
-var results         = {};
-var testSuites      = [];
-var testCases       = [];
-var testAttachments = [];
-var testVideo;
-
-var aSuite;
 var aCaseName;
 var aSuiteName;
+var aClassName;
 var aFileName;
-var aAttachment;
 
 var nestedDescribes;
 var parentSuiteName;
 var parentFileName;
-
-const resultsDir  = 'cypress/results/';
-const specRoot    = "cypress/e2e/";
 
 function MyReporter(runner, options) {
   Base.call(this, runner, options);
   const stats = runner.stats;
 
   runner.on(EVENT_RUN_BEGIN, function() {
-    console.log('BEGIN ...');
-    results         = {};
-    testSuites      = [];
-    testCases       = [];
-    testAttachments = [];
+    console.log('BEGIN:');
     nestedDescribes = -2;
-    if (!fs.existsSync(resultsDir)){
-      fs.mkdirSync(resultsDir);
-    }
   });
-
-  runner.on(EVENT_RUN_END, function() {
-
-    // Root record
-    var rootSuite = {name: "Root Suite",  timestamp: runner.stats.start, tests: runner.stats.tests,  file: aFileName};
-    testSuites.push({$: rootSuite});
-
-    /*
-     Suite record containing testcase record(s)
-     aAttachment = "[[ATTACHMENT|dashboard.png]]";
-     testAttachments.push(aAttachment);
-     */
-
-    console.log(aFileName);
-    let testFilePathLinux  = aFileName.replace(/\\/g, "/");
-    let foldersAndFile     = testFilePathLinux.split(specRoot)[1];
-
-    /*
-    let splitFoldersFile   = foldersAndFile.split("/");
-    console.log(splitFoldersFile, splitFoldersFile[splitFoldersFile.length-1]);
-    var videoFile = "cypress/videos/"+path.basename(aFileName)+".mp4";
-    */
-
-    var videoFile = "cypress/videos/"+foldersAndFile+".mp4";
-    testVideo = "[[ATTACHMENT|"+videoFile+"]]";
-
-    aSuite = {name: aSuiteName, timestamp: runner.stats.start, tests: runner.stats.tests, time: runner.stats.duration};
-    var aSuiteRecord = {$: aSuite, testcase: testCases, 'system-out': testVideo}
-
-    testSuites.push(aSuiteRecord)
-
-    // Stats
-    var rootStats = {name: "Mocha Tests", time: runner.stats.duration,   tests:  runner.stats.tests, failures:  runner.stats.failures};
-    results = { testsuites: {$: rootStats, testsuite:testSuites} }
-
-    var xml = builder.buildObject(results);
-    fs.writeFileSync(resultsDir+"results."+foldersAndFile.replace(/\//g, "-")+".xml",xml);
-
-    //console.log('     END: %d/%d', runner.stats.passes, runner.stats.tests);
-   // console.log("END:", runner.stats)
-
-  });
-
   runner.on(EVENT_SUITE_BEGIN, function() {
     nestedDescribes++;
+    console.log('  SUITE BEGIN ...', stats.suites, nestedDescribes);
   });
-
   runner.on(EVENT_SUITE_END, function() {
+    console.log('  SUITE END   ...', stats.suites, nestedDescribes);
     nestedDescribes--;
+  });
+  runner.on(EVENT_RUN_END, function() {
+    //console.log('     END: %d/%d', runner.stats.passes, runner.stats.tests);
+    console.log("END:")
   });
 
   runner.on(EVENT_TEST_PASS, function(test) {
@@ -140,15 +85,8 @@ function MyReporter(runner, options) {
         }
     }
 
-    /*
-     *  Generate the case record
-     */
-
-    var aCase = {name: aCaseName, classname: aSuiteName, time: test.duration};
-    testCases.push({$: aCase});
-
-    //console.log('       PASSS: %s', test.fullTitle())
-    //console.log("CASE:", runner.stats)
+    console.log('  TEST PASS -> ', aCaseName, aSuiteName, aFileName);
+    aClassName = aSuiteName;
 
   });
 
