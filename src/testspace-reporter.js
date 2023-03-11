@@ -15,17 +15,14 @@ const {
   EVENT_SUITE_END
 } = Mocha.Runner.constants
 
-var results         = {};
-var testSuites      = [];
-var testCases       = [];
-var testAttachments = [];
-var testVideo;
+var results          = {};
+var testSuites       = [];
+var testCases        = [];
 
 var aSuite;
 var aCaseName;
 var aSuiteName;
 var aFileName;
-var aAttachment;
 
 var nestedDescribes;
 var parentSuiteName;
@@ -33,6 +30,7 @@ var parentFileName;
 
 const resultsDir     = 'cypress/results/';
 const videosDir      = 'cypress/videos/';
+const logsDir        = 'cypress/logs/';
 const screenshotsDir = 'cypress/screenshots/';
 const specRoot       = "cypress/e2e/";
 
@@ -84,11 +82,12 @@ function MyReporter(runner, options) {
     results         = {};
     testSuites      = [];
     testCases       = [];
-    testAttachments = [];
     nestedDescribes = -2;
   });
 
   runner.on(EVENT_RUN_END, function() {
+
+    var suiteAttachments = [];
 
     // Root record
     var rootSuite = {name: "Root Suite",  timestamp: stats.start, tests: stats.tests,  file: aFileName};
@@ -97,18 +96,16 @@ function MyReporter(runner, options) {
     let testFilePathLinux  = aFileName.replace(/\\/g, "/");
     let foldersAndFile     = testFilePathLinux.split(specRoot)[1];
 
-    /*
-    let splitFoldersFile   = foldersAndFile.split("/");
-    console.log(splitFoldersFile, splitFoldersFile[splitFoldersFile.length-1]);
-    var videoFile = "cypress/videos/"+path.basename(aFileName)+".mp4";
-    */
-
     var videoFile = videosDir+foldersAndFile+".mp4";
-    testVideo = "[[ATTACHMENT|"+videoFile+"]]";
+    var testVideo = "[[ATTACHMENT|"+videoFile+"]]";
+    suiteAttachments.push(testVideo);
+
+    var logFile   = logsDir+foldersAndFile.replace(".js", ".txt");
+    var testLog   = "[[ATTACHMENT|"+logFile+"]]";
+    suiteAttachments.push(testLog);
 
     aSuite = {name: aSuiteName, timestamp: stats.start, tests: stats.tests, time: stats.duration};
-    var aSuiteRecord = {$: aSuite, testcase: testCases, 'system-out': testVideo}
-
+    var aSuiteRecord = {$: aSuite, testcase: testCases, 'system-out': suiteAttachments}
     testSuites.push(aSuiteRecord)
 
     // Stats
