@@ -1,5 +1,5 @@
 const xml2js = require('xml2js');
-const builder = new xml2js.Builder();
+const builder = new xml2js.Builder({cdata: true});
 const fs = require('fs');
 
 var results     = {};
@@ -24,7 +24,14 @@ testAttachments.push(aAttachment);
 aCase = {name: "c1", classname: "class1", time: "1"};
 testCases.push({$: aCase, 'system-out': testAttachments});
 aCase = {name: "c2", classname: "class1", time: "2"};
-testCases.push({$: aCase});
+
+errMessage = "Expected 1 to equal 1";
+cDATA      = "& my non-parsed data";
+
+aFailure = {$: {message: errMessage, type: "Assertion"}, _: cDATA};
+
+theFailure = {$: aFailure}
+testCases.push({$: aCase, failure: aFailure});
 
 aSuite = {name: "s1", timestamp: "2023-03-01T23:04:45", tests: "2", time: "1" };
 testSuites.push({$: aSuite, testcase: testCases})
