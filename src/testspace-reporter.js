@@ -1,6 +1,6 @@
 const Mocha   = require('mocha');
 const xml2js  = require('xml2js');
-const builder = new xml2js.Builder();
+const builder = new xml2js.Builder({cdata: true});
 const fs      = require('fs');
 const path    = require("path");
 
@@ -147,24 +147,21 @@ function MyReporter(runner, options) {
 
     getCaseRecord(test, stats.suites, nestedDescribes);
     var aCase = {name: aCaseName, classname: aSuiteName, time: test.duration};
-    var message = {message: err.message, type: err.name}
+    var aFailure = {$: {message: err.message, type: err.name}, _: err.stack}; // Note, to force CDATA add "<< "
 
     let testFilePathLinux  = aFileName.replace(/\\/g, "/");
     let foldersAndFile     = testFilePathLinux.split(specRoot)[1];
     let imgFileName        = aCaseName+' (failed).png';
-/*
-    let theSuiteName       = "";
-    if (foldersAndFile != aSuiteName) theSuiteName = aSuiteName+' -- '
-*/
+
     // Checking if case has no parent Describe
     let theSuiteName = aSuiteName+' -- ';
     if (stats.suites == 0 ) theSuiteName = "";
 
     let imageFile      = screenshotsDir+foldersAndFile+'/'+theSuiteName+imgFileName;
     let testScreenshot = "[[ATTACHMENT|"+imageFile+"]]";
-    testCases.push({$: aCase, 'failure': message, 'system-out': testScreenshot });
+    testCases.push({$: aCase, failure: aFailure, 'system-out': testScreenshot });
 
-    //console.log('       FAIL: %s -- error: %s', test.fullTitle(), err.message, err.name);
+    //console.log('       FAIL: %s -- error: %s', test.fullTitle(), err.message, err.name, err.stack);
 
   });
 

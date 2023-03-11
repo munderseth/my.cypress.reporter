@@ -57,3 +57,16 @@ npx cypress open
 ```
 
 Select `Create new spec` for the initial test spec.
+
+## References
+
+Reporter:
+- https://github.com/mochajs/mocha/wiki/Third-party-reporters
+- https://mochajs.org/api/tutorial-custom-reporter.html
+- https://docs.cypress.io/guides/guides/module-api#cypressrun
+
+XML:
+- https://github.com/Leonidas-from-XIV/node-xml2js/blob/master/README.md
+- https://github.com/Leonidas-from-XIV/node-xml2js/blob/master/test/builder.test.coffee - Test Examples
+- https://github.com/Leonidas-from-XIV/node-xml2js/issues/218#issuecomment-120269851 - CDATA record only generated non-normal text.
+- https://github.com/testmoapp/junitxml - Overview of JUnit XML
