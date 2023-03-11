@@ -48,6 +48,40 @@ var obj = {name: "Super", Surname: "Man", age: 23};
 var builder = new xml2js.Builder();
 var xml = builder.buildObject(obj);
 ```
+#### Logs
+This is an optional package:
+
+```
+npm i --save-dev cypress-terminal-report
+```
+
+The `cypress.config.js` file require updates:
+
+```
+ e2e: {
+    // specPattern: "cypress/tests/*.spec.{js,jsx,ts,tsx}",
+    setupNodeEvents(on, config) {
+      const options = {
+        printLogsToConsole: "always",
+        printLogsToFile: "always",
+        outputRoot: config.projectRoot + '/cypress/',
+        specRoot: 'cypress/e2e',
+        outputTarget: {
+          'logs|json': 'json',
+          'logs|txt': 'txt',
+        }
+      };
+      require('cypress-terminal-report/src/installLogsPrinter')(on, options);
+      // implement node event listeners here
+    },
+  },
+```
+
+And `cypress/support/e2e.js`:
+```
+require('cypress-terminal-report/src/installLogsCollector')();
+```
+
 
 ### Configuration
 Use the Cypress App to initially setup.
