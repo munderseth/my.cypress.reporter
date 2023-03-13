@@ -11,6 +11,18 @@ npx cypress run --reporter src/testspace-reporter.js
 testspace cypress/results/results*.xml "#SOME-NAME"
 ```
 
+Using options (specific file(s), turn off cypress console):
+
+```
+npx cypress run --reporter src/testspace-reporter.js --spec cypress/e2e/test1.cy.js --quiet
+```
+
+Using with Cypress Cloud:
+```
+npx cypress run --record --key 784648e4...
+```
+The key setting can be found under *Project settings*. Note that `cypress.config.js` requires a `projectId` setting, also under *Project settings*.
+
 ## Setup
 he following steps required to setup frome scratch.
 
