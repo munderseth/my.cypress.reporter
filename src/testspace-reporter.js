@@ -34,14 +34,19 @@ const logsDir        = 'cypress/logs/';
 const screenshotsDir = 'cypress/screenshots/';
 const specRoot       = "cypress/e2e/";
 
+const optFileSuite = false;
+
 function getCaseRecord(test, suitesCount, nestedDescribes) {
 
   // suites == 0 indicates cases with NO "Describe"
   if (suitesCount == 0) {
+
     aFileName  = test.parent.file;
     aSuiteName = path.basename(aFileName);
     aCaseName  = test.title;  // standard test case name. Will be overwritten for for nested Describes
+
   } else {
+
     aFileName  = test.parent.parent.file;
     aSuiteName = test.parent.title;
     aCaseName  = test.title;  // standard test case name. Will be overwritten for for nested Describes
@@ -64,7 +69,7 @@ function getCaseRecord(test, suitesCount, nestedDescribes) {
       }
       theDescribeNames.reverse()
       theDescribeNames.push(test.title);
-      aCaseName = theDescribeNames.join(" -- ");
+      aCaseName = theDescribeNames.join(" -- "); // same format used by screenshot image path
     }
   }
 
@@ -104,7 +109,7 @@ function MyReporter(runner, options) {
     var testLog   = "[[ATTACHMENT|"+logFile+"]]";
     suiteAttachments.push(testLog);
 
-    aSuite = {name: aSuiteName, timestamp: stats.start, tests: stats.tests, time: stats.duration};
+    aSuite = {name: aFileName, timestamp: stats.start, tests: stats.tests, time: stats.duration};
     var aSuiteRecord = {$: aSuite, testcase: testCases, 'system-out': suiteAttachments}
     testSuites.push(aSuiteRecord)
 
@@ -132,27 +137,44 @@ function MyReporter(runner, options) {
      */
 
     getCaseRecord(test, stats.suites, nestedDescribes);
-    var aCase = {name: aCaseName, classname: aSuiteName, time: test.duration};
+    var aCase;
+    if (optFileSuite) {
+
+      if ( stats.suites != 0 ) aCaseName = aSuiteName+" -- "+aCaseName;
+      aCase = {name: aCaseName, classname: aFileName, time: test.duration};
+
+    } else aCase = {name: aCaseName, classname: aSuiteName, time: test.duration};
+
     testCases.push({$: aCase});
 
     //console.log('       PASSS: %s', test.fullTitle())
     //console.log("CASE:", runner.stats)
-
   });
 
   runner.on(EVENT_TEST_FAIL, function(test, err) {
-
+    var aCase;
     getCaseRecord(test, stats.suites, nestedDescribes);
-    var aCase = {name: aCaseName, classname: aSuiteName, time: test.duration};
+    if (optFileSuite) {
+
+      if ( stats.suites != 0 ) aCaseName = aSuiteName+" -- "+aCaseName;
+      aCase = {name: aCaseName, classname: aFileName, time: test.duration};
+
+    } else aCase = {name: aCaseName, classname: aSuiteName, time: test.duration};
+
     var aFailure = {$: {message: err.message, type: err.name}, _: err.stack}; // Note, to force CDATA add "<< "
 
     let testFilePathLinux  = aFileName.replace(/\\/g, "/");
     let foldersAndFile     = testFilePathLinux.split(specRoot)[1];
     let imgFileName        = aCaseName+' (failed).png';
 
-    // Checking if case has no parent Describe
-    let theSuiteName = aSuiteName+' -- ';
-    if (stats.suites == 0 ) theSuiteName = "";
+    let theSuiteName;
+    if (optFileSuite) {
+      theSuiteName = "";
+    } else {
+      // Checking if case has no parent Describe
+      theSuiteName = aSuiteName+' -- ';
+      if (stats.suites == 0 ) theSuiteName = "";
+    }
 
     let imageFile      = screenshotsDir+foldersAndFile+'/'+theSuiteName+imgFileName;
     let testScreenshot = "[[ATTACHMENT|"+imageFile+"]]";
