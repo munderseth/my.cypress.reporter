@@ -16,6 +16,11 @@ Using options (specific file(s), turn off cypress console):
 ```
 npx cypress run --reporter src/testspace-reporter.js --spec cypress/e2e/test1.cy.js --quiet
 ```
+To force test failures:
+
+```
+npx cypress run --reporter src/testspace-reporter.js --quiet --env CHECK=2
+```
 
 Using with Cypress Cloud:
 ```
