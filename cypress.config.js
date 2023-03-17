@@ -9,8 +9,8 @@ module.exports = defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       const options = {
-        printLogsToConsole: "always",
-        printLogsToFile: "always",
+        printLogsToConsole: "always", // onFail or always
+        printLogsToFile: "always",    // onFail or always
         outputRoot: config.projectRoot + '/cypress/',
         specRoot: 'cypress/e2e',
         outputTarget: {

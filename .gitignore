@@ -4,4 +4,5 @@ cypress/screenshots
 cypress/videos
 cypress/results
 results*.xml
+session.txt
 logs
