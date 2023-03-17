@@ -66,7 +66,7 @@ var builder = new xml2js.Builder();
 var xml = builder.buildObject(obj);
 ```
 #### Logs
-This is an optional package:
+This is an optional package for logging: https://github.com/archfz/cypress-terminal-report.
 
 ```
 npm i --save-dev cypress-terminal-report
