@@ -143,10 +143,13 @@ function MyReporter(runner, options) {
       _TS_CASES = ROOT_TESTSUITE_CASES;
     }
 
-    var attachFilePath   = _TS.file.replace(/\\/g, "/").split(SPEC_ROOT_DIR)[1];
-    var videoFile        = VIDEOS_DIR+attachFilePath+".mp4";
-    var logFile          = LOGS_DIR+attachFilePath.replace(".js", ".txt");
-    var textFile         = fs.readFileSync(logFile, 'utf8')
+    var attachFilePath = _TS.file.replace(/\\/g, "/").split(SPEC_ROOT_DIR)[1];
+    var videoFile      = VIDEOS_DIR+attachFilePath+".mp4";
+    var logFile        = LOGS_DIR+attachFilePath.replace(".js", ".txt");
+    var textFile       = "";
+    if (fs.existsSync(logFile)) {
+      textFile = fs.readFileSync(logFile, 'utf8');
+    }
     var suiteAttachments = textFile+"[[ATTACHMENT|"+videoFile+"]]";
 
     let timeDelta = Date.now() - _TS.timestamp;
