@@ -113,6 +113,7 @@ function MyReporter(runner, options) {
     console.log('RUN BEGIN ...');
     NESTED_DESCRIBES  = -2;
     SUITE_COUNT = -1;
+    suites = [];
   });
 
   runner.on(EVENT_RUN_END, function() {
@@ -123,7 +124,6 @@ function MyReporter(runner, options) {
 
     var testsuites = [];
     suites.forEach( function(s){
-      console.log(s.suite.name);
       var testcases = [];
       s.tests.forEach( function(t){
         testcases.push(createTestRecord(t))
@@ -137,6 +137,7 @@ function MyReporter(runner, options) {
         textFile = fs.readFileSync(logFile, 'utf8');
       }
       var suiteAttachments = textFile+"[[ATTACHMENT|"+videoFile+"]]";
+      if (s.tests.length == 0 ) suiteAttachments = null; // If no test cases do NOT add attachments
 
       let timeDelta = Date.now() - s.suite.timestamp;
       let timestamp = new Date(s.suite.timestamp).toISOString().slice(0, -5)
