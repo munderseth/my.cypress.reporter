@@ -2,10 +2,16 @@ const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
   projectId: "yabpvp",
+  reporter: 'xunit',
+  reporterOptions: {
+    output: 'results-xunit.xml',
+  },
+  /*
   reporter: 'junit',
   reporterOptions: {
     mochaFile: 'cypress/results/results.[hash].xml',
   },
+  */
   e2e: {
     setupNodeEvents(on, config) {
       const options = {
