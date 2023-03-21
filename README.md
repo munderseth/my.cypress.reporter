@@ -19,7 +19,7 @@ npx cypress run --reporter src/testspace-reporter.js --spec cypress/e2e/test1.cy
 To force test failures:
 
 ```
-npx cypress run --reporter src/testspace-reporter.js --quiet --env CHECK=2
+npx cypress run --reporter src/testspace-reporter.js --quiet --env CHECK=0
 ```
 
 Using with Cypress Cloud:
@@ -99,6 +99,14 @@ And `cypress/support/e2e.js`:
 require('cypress-terminal-report/src/installLogsCollector')();
 ```
 
+#### Lint
+Use the https://github.com/eslint/eslint eslint package.
+
+```
+ npm init @eslint/config
+ ```
+
+To execute: `npm run lint`
 
 ### Configuration
 Use the Cypress App to initially setup.

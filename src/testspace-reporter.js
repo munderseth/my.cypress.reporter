@@ -21,11 +21,11 @@ var SUITE_COUNT;
 var suites  = [];
 
 // Settings
-const RESULTS_DIR      = 'cypress/results/';
-const VIDEOS_DIR       = 'cypress/videos/';
-const LOGS_DIR         = 'cypress/logs/';
-const SCREENSHOTS_DIR  = 'cypress/screenshots/';
-const SPEC_ROOT_DIR    = "cypress/e2e/";
+const RESULTS_DIR      = path.normalize('cypress/results/');
+const VIDEOS_DIR       = path.normalize('cypress/videos/');
+const LOGS_DIR         = path.normalize('cypress/logs/');
+const SCREENSHOTS_DIR  = path.normalize('cypress/screenshots/');
+const SPEC_ROOT_DIR    = path.normalize('cypress/e2e/');
 
 function createTestRecord(test) {
   var testName;
@@ -57,8 +57,8 @@ function createTestRecord(test) {
   if (test.state === 'failed') {
     var err = test.err;
     var aFailure        = {$: {message: err.message, type: err.name}, _: err.stack}; // Note, to force CDATA add "<< "
-    var imageFilePath   = testFileName.replace(/\\/g, "/").split(SPEC_ROOT_DIR)[1];
-    var imageFileName   = SCREENSHOTS_DIR+imageFilePath+'/'+testFullName+' (failed).png';
+    var imageFilePath   = path.normalize(testFileName).split(SPEC_ROOT_DIR)[1];
+    var imageFileName   = path.join(SCREENSHOTS_DIR+imageFilePath,'/'+testFullName+' (failed).png');
     var imageScreenshot = "[[ATTACHMENT|"+imageFileName+"]]";
     return {$: {name: testName, classname: className, time: test.duration/1000}, failure: aFailure, 'system-out': imageScreenshot};
   } else {
@@ -79,7 +79,7 @@ function MyReporter(runner, options) {
     suites[suites.length-1].tests.push(test);  // alway use active suite
   });
 
-  runner.on(EVENT_TEST_FAIL, function(test, err) {
+  runner.on(EVENT_TEST_FAIL, function(test) {
     console.log('       FAIL:  %s', test.fullTitle()); // err.message, err.name, err.stack
     suites[suites.length-1].tests.push(test);  // alway use active suite
   });
@@ -103,7 +103,7 @@ function MyReporter(runner, options) {
     console.log('  SUITE BEGIN ...',stats.suites, NESTED_DESCRIBES, SUITE_COUNT);
   });
 
-  runner.on(EVENT_SUITE_END, function(suite) {
+  runner.on(EVENT_SUITE_END, function() {
     console.log('  SUITE END   ...',stats.suites, NESTED_DESCRIBES, SUITE_COUNT);
     SUITE_COUNT--;
     NESTED_DESCRIBES--;
@@ -119,17 +119,30 @@ function MyReporter(runner, options) {
   runner.on(EVENT_RUN_END, function() {
     console.log('RUN END   ...');
 
-    var rootStats = {name: "Cypress Tests"};
-    // !! Add Stats to Cypress Test Suite
+    var rootStats = {
+      name: "Cypress Tests",
+      tests: stats.tests,
+      failures: stats.failures,
+      skipped:stats.tests - stats.failures - stats.passes,
+      errors: 0,
+      timestamp: new Date().toUTCString(),
+      time: stats.duration / 1000
+    };
 
     var testsuites = [];
     suites.forEach( function(s){
       var testcases = [];
+      var tests     = 0;
+      var failures  = 0;
+      var skipped   = 0;
+      var errors    = 0;
       s.tests.forEach( function(t){
         testcases.push(createTestRecord(t))
+        tests++;
+        if (t.state == 'failed') failures++;
       })
 
-      var attachFilePath = s.suite.file.replace(/\\/g, "/").split(SPEC_ROOT_DIR)[1];
+      var attachFilePath = path.normalize(s.suite.file).split(SPEC_ROOT_DIR)[1];
       var videoFile      = VIDEOS_DIR+attachFilePath+".mp4";
       var logFile        = LOGS_DIR+attachFilePath.replace(".js", ".txt");
       var textFile       = "";
@@ -137,20 +150,22 @@ function MyReporter(runner, options) {
         textFile = fs.readFileSync(logFile, 'utf8');
       }
       var suiteAttachments = textFile+"[[ATTACHMENT|"+videoFile+"]]";
-      if (s.tests.length == 0 ) suiteAttachments = null; // If no test cases do NOT add attachments
-
-      let timeDelta = Date.now() - s.suite.timestamp;
-      let timestamp = new Date(s.suite.timestamp).toISOString().slice(0, -5)
-      var suite = {name: s.suite.name, timestamp: timestamp, time: timeDelta/1000, file: s.suite.file};
+      var timedelta = (Date.now() - s.suite.timestamp) / 1000;
+      var timestamp = new Date(s.suite.timestamp).toUTCString(); // toISOString().slice(0, -5)
+      if (s.tests.length == 0 ) {
+        suiteAttachments = null; // If no test cases do NOT add attachments
+        timedelta        = 0; // set time to Zero, no cases exist
+      }
+      var suite = {name: s.suite.name, tests: tests, failures: failures, errors: errors, skipped: skipped, timestamp: timestamp, time: timedelta, file: s.suite.file};
       var suiteRecord = {$: suite, testcase: testcases, 'system-out': suiteAttachments};
       testsuites.push(suiteRecord);
     })
 
     var results  = {testsuites: {$: rootStats, testsuite:testsuites} }
     var xml      = builder.buildObject(results);
-    var filename = suites[0].suite.file;
-    var filePath = filename.replace(/\\/g, "/").split(SPEC_ROOT_DIR)[1];
-    fs.writeFileSync(RESULTS_DIR+"results."+filePath.replace(/\//g, "-")+".xml",xml);
+    var filename = path.normalize(suites[0].suite.file);  // All Suites contain the spec filename
+    var filepath = filename.split(SPEC_ROOT_DIR)[1];
+    fs.writeFileSync(RESULTS_DIR+"results."+filepath.split(path.sep).join('-')+".xml", xml);
     fs.writeFileSync("results.xml",xml);
 
   });
