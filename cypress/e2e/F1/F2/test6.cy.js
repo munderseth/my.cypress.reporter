@@ -1,5 +1,5 @@
 var CHECK = 1;
-if (Cypress.env('CHECK')) CHECK=Cypress.env('CHECK');
+if (Cypress.env('CHECK') !== undefined) CHECK=Cypress.env('CHECK');
 
 describe('TEST6', () => {
   it('case1', () => { })
@@ -29,7 +29,9 @@ describe('TEST6', () => {
 })
 it('case1', () => { })
 it('case2', () => { })
-it('case3', () => { })
+it('case3', () => {
+  expect(1).to.equal(CHECK);
+})
 
 
 
