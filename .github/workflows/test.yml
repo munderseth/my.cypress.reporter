@@ -1,0 +1,24 @@
+name: Testspace Cloud
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      - uses: testspace-com/setup-testspace@v1
+        with:
+          domain: ${{github.repository_owner}}.stridespace.com
+          token:  ${{ secrets.TESTSPACE_TOKEN }}
+        env:
+          TESTSPACE_CLIENT_VER: dev
+      - run: npm install
+      - run: npm test
+      - name: Push test result to Testspace
+        run: |
+          node ./src/list.js
+          testspace cypress/results/*.xml{cypress/e2e}
+        if: always()

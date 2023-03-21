@@ -1,5 +1,5 @@
 var CHECK = 1;
-if (Cypress.env('CHECK')) CHECK=Cypress.env('CHECK');
+if (Cypress.env('CHECK') !== undefined) CHECK=Cypress.env('CHECK');
 
 it('case1', () => {})
 it('case2', () => {})
