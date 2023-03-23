@@ -1,7 +1,7 @@
 const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
-  projectId: "yabpvp",
+  projectId: "yk4k3j",
   reporter: 'xunit',
   reporterOptions: {
     output: 'results-xunit.xml',
