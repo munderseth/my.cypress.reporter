@@ -5,7 +5,7 @@ This is a prototype/sandbox to learn the reporter requirement specifics.
 To use the reporter:
 
 ```
-npx cypress run --reporter src/testspace-reporter.js
+npx cypress run --reporter src/cy-reporter.js
 ```
 ```
 testspace cypress/results/results*.xml "#SOME-NAME"
@@ -14,12 +14,12 @@ testspace cypress/results/results*.xml "#SOME-NAME"
 Using options (specific file(s), turn off cypress console):
 
 ```
-npx cypress run --reporter src/testspace-reporter.js --spec cypress/e2e/test1.cy.js --quiet
+npx cypress run --reporter src/cy-reporter.js --spec cypress/e2e/test1.cy.js --quiet
 ```
 To force test failures:
 
 ```
-npx cypress run --reporter src/testspace-reporter.js --quiet --env CHECK=0
+npx cypress run --reporter src/cy-reporter.js --quiet --env CHECK=0
 ```
 
 Using with Cypress Cloud:

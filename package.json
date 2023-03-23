@@ -1,23 +1,23 @@
 {
-  "name": "cypress.testspace.reporter",
+  "name": "my.cypress.reporter",
   "version": "1.0.0",
   "description": "This is a prototype/sandbox to learn the reporter requirement specifics.",
   "main": "index.js",
   "scripts": {
-    "test": "npx cypress run --reporter src/testspace-reporter.js --env CHECK=0",
+    "test": "npx cypress run --reporter src/cy-reporter.js --env CHECK=0",
     "lint": "eslint src/*reporter*.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/munderseth/cypress.testspace.reporter.git"
+    "url": "git+https://github.com/munderseth/my.cypress.reporter.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/munderseth/cypress.testspace.reporter/issues"
+    "url": "https://github.com/munderseth/my.cypress.reporter/issues"
   },
-  "homepage": "https://github.com/munderseth/cypress.testspace.reporter#readme",
+  "homepage": "https://github.com/munderseth/my.cypress.reporter#readme",
   "devDependencies": {
     "cypress": "^12.7.0",
     "cypress-terminal-report": "^5.0.2",
