@@ -1,3 +1,8 @@
+'use strict';
+/**
+ * @module CypressJUnit
+ */
+
 const Mocha   = require('mocha');
 const xml2js  = require('xml2js');
 const builder = new xml2js.Builder({cdata: true});
@@ -15,17 +20,18 @@ const {
   EVENT_SUITE_END
 } = Mocha.Runner.constants
 
-// Global Variables
-var NESTED_DESCRIBES;   // -1 = ROOT, 0 = TESTSUITE, > 0 = NESTED
-var SUITE_COUNT;
-var suites  = [];
-
 // Settings
 const RESULTS_DIR      = path.normalize('cypress/results/');
 const VIDEOS_DIR       = path.normalize('cypress/videos/');
 const LOGS_DIR         = path.normalize('cypress/logs/');
 const SCREENSHOTS_DIR  = path.normalize('cypress/screenshots/');
 const SPEC_ROOT_DIR    = path.normalize('cypress/e2e/');
+
+/**
+ * Process the Runner test object
+ * @param {Object} test
+ * @returns {testcase record object} 
+ */
 
 function createTestRecord(test) {
   var testName;
@@ -66,10 +72,17 @@ function createTestRecord(test) {
   }
 }
 
-function MyReporter(runner, options) {
+function CypressJUnit(runner, options) {
   Base.call(this, runner, options);
+
+  // Variables
+  var NESTED_DESCRIBES;   // -1 = ROOT, 0 = TESTSUITE, > 0 = NESTED
+  var SUITE_COUNT;
+  var suites  = [];
+
   const stats = runner.stats;
   console.log("START: options:", options)
+
   if (!fs.existsSync(RESULTS_DIR)){
     fs.mkdirSync(RESULTS_DIR);
   }
@@ -172,4 +185,4 @@ function MyReporter(runner, options) {
 
 }
 
-module.exports = MyReporter;
+module.exports = CypressJUnit;
