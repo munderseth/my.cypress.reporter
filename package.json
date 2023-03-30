@@ -4,7 +4,7 @@
   "description": "This is a prototype/sandbox to learn the reporter requirement specifics.",
   "main": "index.js",
   "scripts": {
-    "test": "npx cypress run --reporter src/cy-reporter.js --env CHECK=0 || 0",
+    "test": "npx cypress run --env CHECK=0",
     "lint": "eslint src/*reporter*.js"
   },
   "repository": {

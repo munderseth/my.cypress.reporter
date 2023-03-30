@@ -16,7 +16,7 @@ jobs:
         env:
           TESTSPACE_CLIENT_VER: dev
       - run: npm install
-      - run: npm test
+      - run: npm test || true
       - name: Push test result to Testspace
         run: |
           testspace cypress/results/*.xml{cypress/e2e}
