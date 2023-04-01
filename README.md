@@ -29,7 +29,7 @@ npx cypress run --record --key 784648e4...
 The key setting can be found under *Project settings*. Note that `cypress.config.js` requires a `projectId` setting, also under *Project settings*.
 
 ## Setup
-he following steps required to setup frome scratch.
+The following steps required to setup frome scratch.
 
 `.gitignore`
 ```

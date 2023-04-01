@@ -2,10 +2,13 @@ const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
   projectId: "yk4k3j",
+  reporter: 'cypress-xml-reporter',
+  /*
   reporter: 'xunit',
   reporterOptions: {
     output: 'results-xunit.xml',
   },
+  */
   /*
   reporter: 'junit',
   reporterOptions: {
