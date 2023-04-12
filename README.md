@@ -5,21 +5,26 @@ This is a prototype/sandbox to learn the reporter requirement specifics.
 To use the reporter:
 
 ```
-npx cypress run --reporter src/cy-reporter.js
+npm run test -- --quiet
 ```
+Or
 ```
-testspace cypress/results/results*.xml "#SOME-NAME"
+npx cypress run
+```
+
+```
+testspace "cypress/results/test*.xml{cypress/e2e}" "cypress/results/**/test*.xml{cypress/e2e}" "#SOME-NAME"
 ```
 
 Using options (specific file(s), turn off cypress console):
 
 ```
-npx cypress run --reporter src/cy-reporter.js --spec cypress/e2e/test1.cy.js --quiet
+npx cypress run --spec cypress/e2e/test1.cy.js --quiet
 ```
 To force test failures:
 
 ```
-npx cypress run --reporter src/cy-reporter.js --quiet --env CHECK=0
+npx cypress run -env CHECK=0
 ```
 
 Using with Cypress Cloud:
