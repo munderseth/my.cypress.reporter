@@ -13,7 +13,7 @@ npx cypress run
 ```
 
 ```
-testspace "cypress/results/test*.xml{cypress/e2e}" "cypress/results/**/test*.xml{cypress/e2e}" "#SOME-NAME"
+testspace "results/cypress/e2e/test*.xml{cypress/e2e}" "results/cypress/e2e/**/test*.xml{cypress/e2e}" #SOME-NAME"
 ```
 
 Using options (specific file(s), turn off cypress console):
