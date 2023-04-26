@@ -1,6 +1,7 @@
 name: Testspace Cloud
 on:
   workflow_dispatch:
+  push:
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -19,5 +20,5 @@ jobs:
       - run: npm test || true
       - name: Push test result to Testspace
         run: |
-          testspace "cypress/results/test*.xml{cypress/e2e}" "cypress/results/**/test*.xml{cypress/e2e}"
+          testspace "results/test*.xml{cypress/e2e}" "results/**/test*.xml{cypress/e2e}"
         if: always()
