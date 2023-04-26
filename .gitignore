@@ -2,7 +2,9 @@
 node_modules
 cypress/screenshots
 cypress/videos
-cypress/results
+# Cypress-mochaawesome-reporter output
+cypress/reports
+results/
 results*.xml
 session.txt
 logs
