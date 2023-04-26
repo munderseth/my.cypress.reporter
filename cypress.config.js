@@ -2,7 +2,8 @@ const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
   projectId: "yk4k3j",
-  reporter: 'cypress-xml-reporter',
+  //reporter: 'cypress-xml-reporter',
+  //reporter: 'cypress-mochawesome-reporter',
   /*
   reporter: 'xunit',
   reporterOptions: {
@@ -28,7 +29,8 @@ module.exports = defineConfig({
         }
       };
       require('cypress-terminal-report/src/installLogsPrinter')(on, options);
-      // implement node event listeners here
+      require('cypress-xml-reporter/src/plugin') (on);
+      require('cypress-mochawesome-reporter/plugin')(on);
     },
   },
 });
