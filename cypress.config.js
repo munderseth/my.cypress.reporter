@@ -30,7 +30,7 @@ module.exports = defineConfig({
       };
       require('cypress-terminal-report/src/installLogsPrinter')(on, options);
       require('cypress-xml-reporter/src/plugin') (on);
-      require('cypress-mochawesome-reporter/plugin')(on);
+      //require('cypress-mochawesome-reporter/plugin')(on); // Need to enable to use; problems using 2 plugins at the same time
     },
   },
 });
