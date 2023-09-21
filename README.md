@@ -9,11 +9,11 @@ npm run test -- --quiet
 ```
 Or
 ```
-npx cypress run
+npx cypress run --reporter cypress-xml-reporter
 ```
 
 ```
-testspace "results/cypress/e2e/test*.xml{cypress/e2e}" "results/cypress/e2e/**/test*.xml{cypress/e2e}" #SOME-NAME"
+testspace "results/cypress/e2e/**/test*.xml{cypress/e2e}" #SOME-NAME"
 ```
 
 Using options (specific file(s), turn off cypress console):
@@ -60,7 +60,7 @@ Using the [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js) based on mo
 
 Install:
 ```
-npm install xml2js
+npm install xml2js --save-dev
 ```
 
 Build:
